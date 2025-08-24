@@ -29,6 +29,7 @@ public class BoundaryConditionsTest {
         Film createdFilm = filmController.create(film);
         assertNotNull(createdFilm);
     }
+
     @Test
     void filmDescription_201Characters_ShouldThrowValidationException() {
         Film film = new Film();

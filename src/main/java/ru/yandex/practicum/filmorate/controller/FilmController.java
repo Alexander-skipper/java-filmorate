@@ -35,7 +35,7 @@ public class FilmController {
 
 @PutMapping
 public Film update(@RequestBody Film film) {
-    log.info("Получен запрос на обновление фильма: {}",film );
+    log.info("Получен запрос на обновление фильма: {}", film);
 
     if (film.getId() == null) {
         log.error("Id фильма должен быть указан");

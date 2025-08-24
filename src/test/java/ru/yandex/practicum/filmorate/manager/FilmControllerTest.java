@@ -44,7 +44,7 @@ public class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(120);
 
-        assertThrows(ValidationException.class, () ->filmController.create(film));
+        assertThrows(ValidationException.class, () -> filmController.create(film));
     }
 
     @Test
