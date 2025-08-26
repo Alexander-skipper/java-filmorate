@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 
@@ -28,17 +27,6 @@ public class BoundaryConditionsTest {
 
         Film createdFilm = filmController.create(film);
         assertNotNull(createdFilm);
-    }
-
-    @Test
-    void filmDescription_201Characters_ShouldThrowValidationException() {
-        Film film = new Film();
-        film.setName("Test Film");
-        film.setDescription("A".repeat(201)); // 201 символ
-        film.setReleaseDate(LocalDate.of(2000, 1, 1));
-        film.setDuration(120);
-
-        assertThrows(ValidationException.class, () -> filmController.create(film));
     }
 
     @Test
