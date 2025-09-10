@@ -1,9 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.validation.CreateValidation;
 import ru.yandex.practicum.filmorate.validation.UpdateValidation;
@@ -26,6 +23,8 @@ public class Film {
     private LocalDate releaseDate;
 
     @Positive(message = "Продолжительность должна быть положительным числом",
+            groups = {CreateValidation.class, UpdateValidation.class})
+    @Min(value = 1, message = "Продолжительность должна быть не менее 1 минуты",
             groups = {CreateValidation.class, UpdateValidation.class})
     private int duration;
 }

@@ -2,6 +2,7 @@ package ru.yandex.practicum.filmorate.manager;
 
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
@@ -14,8 +15,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class BoundaryConditionsTest {
-    private final FilmController filmController = new FilmController();
-    private final UserController userController = new UserController();
+
+    @Autowired
+    private FilmController filmController;
+
+    @Autowired
+    private UserController userController;
 
     @Test
     void filmDescription_Exactly200Characters_ShouldSuccess() {

@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.manager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -14,12 +15,14 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class UserControllerTest {
+
+    @Autowired
     private UserController userController;
+
     private User validUser;
 
     @BeforeEach
     void setUp() {
-        userController = new UserController();
         validUser = new User();
         validUser.setEmail("test@example.com");
         validUser.setLogin("testlogin");
