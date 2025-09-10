@@ -43,6 +43,11 @@ public class InMemoryUserStorage implements UserStorage {
         users.remove(id);
     }
 
+    @Override
+    public void deleteAll() {
+        users.clear();
+    }
+
     private Long getNextId() {
         return users.keySet().stream()
                 .mapToLong(id -> id)

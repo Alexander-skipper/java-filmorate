@@ -6,8 +6,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.FilmController;
+import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
 
@@ -19,10 +21,15 @@ public class FilmControllerTest {
     @Autowired
     private FilmController filmController;
 
+    @Autowired
+    private FilmStorage filmStorage;
+
     private Film validFilm;
 
     @BeforeEach
     void setUp() {
+        filmStorage.deleteAll();
+
         validFilm = new Film();
         validFilm.setName("Valid Film");
         validFilm.setDescription("Valid description");
@@ -86,7 +93,7 @@ public class FilmControllerTest {
 
 
     @Test
-    void updateFilm_WithNonExistentId_ShouldThrowValidationException() {
+    void updateFilm_WithNonExistentId_ShouldThrowNotFoundException() {
         Film film = new Film();
         film.setId(999L);
         film.setName("Test Film");
@@ -94,7 +101,7 @@ public class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(120);
 
-        assertThrows(ValidationException.class, () -> filmController.update(film));
+        assertThrows(FilmNotFoundException.class, () -> filmController.update(film));
     }
 
     @Test
