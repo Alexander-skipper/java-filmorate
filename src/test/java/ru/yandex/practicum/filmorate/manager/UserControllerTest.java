@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -111,7 +112,7 @@ public class UserControllerTest {
         user.setLogin("login");
         user.setBirthday(LocalDate.of(1990, 1, 1));
 
-        assertThrows(UserNotFoundException.class, () -> userController.update(user));
+        assertThrows(ValidationException.class, () -> userController.update(user));
     }
 
     @Test
