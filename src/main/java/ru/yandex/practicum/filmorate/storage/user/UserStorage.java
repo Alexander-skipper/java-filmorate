@@ -18,4 +18,10 @@ public interface UserStorage {
     void delete(Long id);
 
     void deleteAll();
+
+    boolean emailExists(String email);
+
+    void addEmail(String email);
+
+    void removeEmail(String email);
 }

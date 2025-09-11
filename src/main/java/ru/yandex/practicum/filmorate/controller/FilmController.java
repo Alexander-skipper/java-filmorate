@@ -5,11 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.FilmService;
-import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.validation.CreateValidation;
 import ru.yandex.practicum.filmorate.validation.FilmValidator;
 import ru.yandex.practicum.filmorate.validation.UpdateValidation;
@@ -23,13 +21,11 @@ import java.util.Collection;
 public class FilmController {
     private final FilmService filmService;
     private final FilmValidator filmValidator;
-    private final FilmStorage filmStorage;
 
     @Autowired
-    public FilmController(FilmService filmService, FilmValidator filmValidator, FilmStorage filmStorage) {
+    public FilmController(FilmService filmService, FilmValidator filmValidator) {
         this.filmService = filmService;
         this.filmValidator = filmValidator;
-        this.filmStorage = filmStorage;
     }
 
     @GetMapping
@@ -63,8 +59,7 @@ public class FilmController {
             throw new ValidationException("ID фильма не может быть null");
         }
 
-        filmStorage.findById(film.getId())
-                .orElseThrow(() -> new FilmNotFoundException("Фильм с id = " + film.getId() + " не найден"));
+        filmService.findById(film.getId());
 
         filmValidator.validateForUpdate(film);
         Film updatedFilm = filmService.update(film);

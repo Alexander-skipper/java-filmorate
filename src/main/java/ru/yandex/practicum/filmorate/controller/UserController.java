@@ -5,11 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 import ru.yandex.practicum.filmorate.validation.CreateValidation;
 import ru.yandex.practicum.filmorate.validation.UpdateValidation;
 import ru.yandex.practicum.filmorate.validation.UserValidator;
@@ -24,13 +22,11 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     private final UserValidator userValidator;
-    private final UserStorage userStorage;
 
     @Autowired
-    public UserController(UserService userService, UserValidator userValidator, UserStorage userStorage) {
+    public UserController(UserService userService, UserValidator userValidator) {
         this.userService = userService;
         this.userValidator = userValidator;
-        this.userStorage = userStorage;
     }
 
     @GetMapping
@@ -64,8 +60,8 @@ public class UserController {
             throw new ValidationException("ID пользователя не может быть null");
         }
 
-        userStorage.findById(user.getId())
-                .orElseThrow(() -> new UserNotFoundException("Пользователь с id = " + user.getId() + " не найден"));
+        userService.findById(user.getId());
+
         userValidator.processUserFields(user);
         User updatedUser = userService.update(user);
         log.info("Пользователь обновлен успешно: {}", updatedUser);
