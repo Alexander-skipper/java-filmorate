@@ -1,6 +1,7 @@
 package ru.yandex.practicum.filmorate.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.validation.CreateValidation;
@@ -31,6 +32,7 @@ public class User {
             UpdateValidation.class})
     private LocalDate birthday;
 
+    @JsonIgnore
     private Set<Long> friends = new HashSet<>();
 
     public boolean addFriend(Long friendId) {

@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -44,7 +43,7 @@ public class FilmService {
 
     public void addLike(Long filmId, Long userId) {
         Film film = findById(filmId);
-        User user = userStorage.findById(userId)
+        userStorage.findById(userId)
                 .orElseThrow(() ->
                     new UserNotFoundException("Пользователь с id = " + userId + " не найден"));
 
@@ -60,7 +59,7 @@ public class FilmService {
 
     public void removeLike(Long filmId, Long userId) {
         Film film = findById(filmId);
-        User user = userStorage.findById(userId)
+        userStorage.findById(userId)
                 .orElseThrow(() ->
                         new UserNotFoundException("Пользователь с id = " + userId + " не найден"));
 

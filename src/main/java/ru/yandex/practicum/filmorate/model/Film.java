@@ -1,5 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 import ru.yandex.practicum.filmorate.validation.CreateValidation;
@@ -31,6 +32,7 @@ public class Film {
             groups = {CreateValidation.class, UpdateValidation.class})
     private int duration;
 
+    @JsonIgnore
     private Set<Long> likes = new HashSet<>();
 
     public boolean addLike(Long userId) {

@@ -25,6 +25,13 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public User update(User user) {
+        User existingUser = users.get(user.getId());
+        if (existingUser != null) {
+            if (!existingUser.getEmail().equals(user.getEmail())) {
+                existingEmails.remove(existingUser.getEmail());
+                existingEmails.add(user.getEmail());
+            }
+        }
         users.put(user.getId(), user);
         return user;
     }
@@ -36,7 +43,10 @@ public class InMemoryUserStorage implements UserStorage {
 
     @Override
     public void delete(Long id) {
-        users.remove(id);
+        User user = users.remove(id);
+        if (user != null) {
+            existingEmails.remove(user.getEmail());
+        }
     }
 
     @Override
