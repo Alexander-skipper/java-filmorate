@@ -2,43 +2,53 @@ package ru.yandex.practicum.filmorate.controller;
 
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.service.UserService;
 import ru.yandex.practicum.filmorate.validation.CreateValidation;
 import ru.yandex.practicum.filmorate.validation.UpdateValidation;
+import ru.yandex.practicum.filmorate.validation.UserValidator;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
 @Validated
 public class UserController {
-    private final Map<Long, User> users = new HashMap<>();
+    private final UserService userService;
+    private final UserValidator userValidator;
+
+    @Autowired
+    public UserController(UserService userService, UserValidator userValidator) {
+        this.userService = userService;
+        this.userValidator = userValidator;
+    }
 
     @GetMapping
     public Collection<User> findAll() {
-        log.info("Получен запрос на получение всех пользователей. Текущее количество: {}", users.size());
-        return users.values();
+        log.info("Получен запрос на получение всех пользователей");
+        return userService.findAll();
+    }
+
+    @GetMapping("/{id}")
+    public User findById(@PathVariable Long id) {
+        log.info("Получен запрос на получение пользователя с id = {}", id);
+        return userService.findById(id);
     }
 
     @PostMapping
     @Validated(CreateValidation.class)
     public User create(@Valid @RequestBody User user) {
         log.info("Получен запрос на создание пользователя: {}", user);
-        user.setId(getNextId());
-
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-
-        users.put(user.getId(), user);
-        log.info("Пользователь создан успешно: {}", user);
-        return user;
+        userValidator.processUserFields(user);
+        User createdUser = userService.create(user);
+        log.info("Пользователь создан успешно: {}", createdUser);
+        return createdUser;
     }
 
     @PutMapping
@@ -47,41 +57,40 @@ public class UserController {
         log.info("Получен запрос на обновление пользователя: {}", user);
 
         if (user.getId() == null) {
-            log.error("Id пользователя должен быть указан");
-            throw new ValidationException("Id должен быть указан");
+            throw new ValidationException("ID пользователя не может быть null");
         }
 
-        if (!users.containsKey(user.getId())) {
-            log.error("Пользователь с id = {} не найден", user.getId());
-            throw new ValidationException("Пользователь с id = " + user.getId() + " не найден");
-        }
+        userService.findById(user.getId());
 
-        User existingUser = users.get(user.getId());
-        if (user.getEmail() == null) {
-            user.setEmail(existingUser.getEmail());
-        }
-
-        if (user.getLogin() == null) {
-            user.setLogin(existingUser.getLogin());
-        }
-
-        if (user.getBirthday() == null) {
-            user.setBirthday(existingUser.getBirthday());
-        }
-
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-
-        users.put(user.getId(), user);
-        log.info("Пользователь обновлен успешно: {}", user);
-        return user;
+        userValidator.processUserFields(user);
+        User updatedUser = userService.update(user);
+        log.info("Пользователь обновлен успешно: {}", updatedUser);
+        return updatedUser;
     }
 
-    private Long getNextId() {
-        return users.keySet().stream()
-                .mapToLong(id -> id)
-                .max()
-                .orElse(0) + 1;
+    @PutMapping("/{id}/friends/{friendId}")
+    public void addFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        log.info("Получен запрос на добавление в друзья: пользователь {} добавляет пользователя {}", id, friendId);
+        userService.addFriend(id, friendId);
+        log.info("Друг добавлен успешно");
+    }
+
+    @DeleteMapping("/{id}/friends/{friendId}")
+    public void removeFriend(@PathVariable Long id, @PathVariable Long friendId) {
+        log.info("Получен запрос на удаление из друзей: пользователь {} удаляет пользователя {}", id, friendId);
+        userService.removeFriend(id, friendId);
+        log.info("Друг удален успешно");
+    }
+
+    @GetMapping("/{id}/friends")
+    public List<User> getFriends(@PathVariable Long id) {
+        log.info("Получен запрос на получение друзей пользователя {}", id);
+        return userService.getFriends(id);
+    }
+
+    @GetMapping("/{id}/friends/common/{otherId}")
+    public List<User> getCommonFriends(@PathVariable Long id, @PathVariable Long otherId) {
+        log.info("Получен запрос на получение общих друзей пользователей {} и {}", id, otherId);
+        return userService.getCommonFriends(id, otherId);
     }
 }

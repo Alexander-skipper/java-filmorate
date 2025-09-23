@@ -3,10 +3,13 @@ package ru.yandex.practicum.filmorate.manager;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.UserController;
+import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import java.time.LocalDate;
 
@@ -14,12 +17,19 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 public class UserControllerTest {
+
+    @Autowired
     private UserController userController;
+
+    @Autowired
+    private UserStorage userStorage;
+
     private User validUser;
 
     @BeforeEach
     void setUp() {
-        userController = new UserController();
+
+        userStorage.deleteAll();
         validUser = new User();
         validUser.setEmail("test@example.com");
         validUser.setLogin("testlogin");
@@ -91,7 +101,7 @@ public class UserControllerTest {
         user.setLogin("login");
         user.setBirthday(LocalDate.of(1990, 1, 1));
 
-        assertThrows(ValidationException.class, () -> userController.update(user));
+        assertThrows(UserNotFoundException.class, () -> userController.update(user));
     }
 
     @Test
