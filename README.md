@@ -53,17 +53,7 @@ INSERT INTO film_genres (film_id, genre_id) VALUES
 (LAST_INSERT_ID(), 4); -- Триллер
 ```
 
-### 4. Получение общих друзей двух пользователей
-```sql
-SELECT u.user_id, u.name, u.login
-FROM friendships f1
-JOIN friendships f2 ON f1.user_id2 = f2.user_id2
-JOIN users u ON f1.user_id2 = u.user_id
-WHERE f1.user_id1 = 1 AND f2.user_id1 = 2
-AND f1.status = 'confirmed' AND f2.status = 'confirmed';
-```
-
-### 5. Получение фильмов по жанру
+### 4. Получение фильмов по жанру
 ```sql
 SELECT f.film_id, f.name, f.release_date, g.name as genre
 FROM films f
@@ -73,17 +63,10 @@ WHERE g.name = 'Комедия'
 ORDER BY f.release_date DESC;
 ```
 
-### 6. Добавление лайка фильму
+### 5. Добавление лайка фильму
 ```sql
 INSERT INTO film_likes (film_id, user_id)
 VALUES (1, 1);
-```
-
-### 7. Подтверждение дружбы
-```sql
-UPDATE friendships 
-SET status = 'confirmed' 
-WHERE user_id1 = 2 AND user_id2 = 1;
 ```
 
 ## Основные операции приложения
