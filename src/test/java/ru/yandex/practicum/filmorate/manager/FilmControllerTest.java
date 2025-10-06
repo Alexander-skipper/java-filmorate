@@ -10,6 +10,7 @@ import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.time.LocalDate;
@@ -37,6 +38,10 @@ public class FilmControllerTest {
         validFilm.setDescription("Valid description");
         validFilm.setReleaseDate(LocalDate.of(2000, 1, 1));
         validFilm.setDuration(120);
+
+        Mpa mpa = new Mpa();
+        mpa.setId(1L);
+        validFilm.setMpa(mpa);
     }
 
     @Test

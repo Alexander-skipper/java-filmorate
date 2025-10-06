@@ -4,6 +4,7 @@ package ru.yandex.practicum.filmorate.manager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
@@ -29,6 +30,7 @@ public class BoundaryConditionsTest {
     private FilmStorage filmStorage;
 
     @Autowired
+    @Qualifier("filmDbStorage")
     private UserStorage userStorage;
 
     @BeforeEach
