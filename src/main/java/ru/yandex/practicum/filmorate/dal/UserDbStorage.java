@@ -65,6 +65,7 @@ public class UserDbStorage extends BaseRepository<User> implements UserStorage {
         jdbc.update("DELETE FROM friendships");
         jdbc.update("DELETE FROM film_likes");
         jdbc.update("DELETE FROM users");
+        jdbc.update("ALTER TABLE users ALTER COLUMN user_id RESTART WITH 1");
     }
 
     @Override
