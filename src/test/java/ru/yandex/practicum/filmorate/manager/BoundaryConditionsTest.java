@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import ru.yandex.practicum.filmorate.controller.FilmController;
 import ru.yandex.practicum.filmorate.controller.UserController;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Mpa;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
@@ -27,10 +28,11 @@ public class BoundaryConditionsTest {
     private UserController userController;
 
     @Autowired
+    @Qualifier("filmDbStorage")
     private FilmStorage filmStorage;
 
     @Autowired
-    @Qualifier("filmDbStorage")
+    @Qualifier("userDbStorage")
     private UserStorage userStorage;
 
     @BeforeEach
@@ -40,7 +42,6 @@ public class BoundaryConditionsTest {
     }
 
 
-
     @Test
     void filmDescription_Exactly200Characters_ShouldSuccess() {
         Film film = new Film();
@@ -48,6 +49,10 @@ public class BoundaryConditionsTest {
         film.setDescription("A".repeat(200));
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(120);
+
+        Mpa mpa = new Mpa();
+        mpa.setId(1L);
+        film.setMpa(mpa);
 
         Film createdFilm = filmController.create(film);
         assertNotNull(createdFilm);
@@ -86,6 +91,10 @@ public class BoundaryConditionsTest {
         film.setReleaseDate(LocalDate.of(1895, 12, 28));
         film.setDuration(120);
 
+        Mpa mpa = new Mpa();
+        mpa.setId(1L);
+        film.setMpa(mpa);
+
         Film createdFilm = filmController.create(film);
         assertNotNull(createdFilm);
     }
@@ -97,6 +106,10 @@ public class BoundaryConditionsTest {
         film.setDescription("Description");
         film.setReleaseDate(LocalDate.of(2000, 1, 1));
         film.setDuration(1);
+
+        Mpa mpa = new Mpa();
+        mpa.setId(1L);
+        film.setMpa(mpa);
 
         Film createdFilm = filmController.create(film);
         assertNotNull(createdFilm);

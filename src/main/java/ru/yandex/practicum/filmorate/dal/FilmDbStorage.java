@@ -22,9 +22,7 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
 
     @Override
     public Collection<Film> findAll() {
-        String sql = "SELECT f.*, m.name as mpa_name FROM films f " +
-                "LEFT JOIN mpa_ratings m ON f.mpa_id = m.mpa_id " +
-                "ORDER BY f.film_id ASC";
+        String sql = "SELECT * FROM films ORDER BY film_id ASC";
         List<Film> films = findMany(sql);
         films.forEach(this::loadAdditionalData);
         return films;

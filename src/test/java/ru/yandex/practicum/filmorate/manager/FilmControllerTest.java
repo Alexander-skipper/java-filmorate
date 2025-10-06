@@ -72,6 +72,10 @@ public class FilmControllerTest {
         film.setReleaseDate(LocalDate.of(1895, 12, 28));
         film.setDuration(120);
 
+        Mpa mpa = new Mpa();
+        mpa.setId(1L);
+        film.setMpa(mpa);
+
         Film createdFilm = filmController.create(film);
         assertNotNull(createdFilm);
     }

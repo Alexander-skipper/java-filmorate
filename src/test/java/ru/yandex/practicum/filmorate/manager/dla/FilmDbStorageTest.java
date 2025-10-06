@@ -37,7 +37,7 @@ public class FilmDbStorageTest {
         assertThat(filmOptional)
                 .isPresent()
                 .hasValueSatisfying(f ->
-                        assertThat(f).hasFieldOrPropertyWithValue("filmId", createdFilm.getId())
+                        assertThat(f).hasFieldOrPropertyWithValue("id", createdFilm.getId())
                 );
     }
 }

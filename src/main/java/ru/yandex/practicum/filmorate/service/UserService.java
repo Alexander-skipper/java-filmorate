@@ -51,8 +51,8 @@ public class UserService {
             if (userStorage.emailExists(user.getEmail())) {
                 throw new ValidationException("Пользователь с email " + user.getEmail() + " уже существует");
             }
-            //userStorage.removeEmail(existingUser.getEmail());
-            //userStorage.addEmail(user.getEmail());
+            userStorage.removeEmail(existingUser.getEmail());
+            userStorage.addEmail(user.getEmail());
         }
         return userStorage.update(user);
     }
