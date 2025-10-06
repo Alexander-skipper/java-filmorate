@@ -2,7 +2,9 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.UserDbStorage;
 import ru.yandex.practicum.filmorate.exception.UserNotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -17,7 +19,7 @@ public class UserService {
     private final UserStorage userStorage;
 
     @Autowired
-    public UserService(UserStorage userStorage) {
+    public UserService(@Qualifier("userDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -49,8 +51,8 @@ public class UserService {
             if (userStorage.emailExists(user.getEmail())) {
                 throw new ValidationException("Пользователь с email " + user.getEmail() + " уже существует");
             }
-            userStorage.removeEmail(existingUser.getEmail());
-            userStorage.addEmail(user.getEmail());
+            //userStorage.removeEmail(existingUser.getEmail());
+            //userStorage.addEmail(user.getEmail());
         }
         return userStorage.update(user);
     }
@@ -64,19 +66,23 @@ public class UserService {
         User user = findById(userId);
         User friend = findById(friendId);
 
-        boolean addedToUser = user.addFriend(friendId);
-        boolean addedToFriend = friend.addFriend(userId);
-
-        if (!addedToUser) {
-            log.trace("Пользователь {} уже в друзьях у {}", friendId, userId);
+        if (userStorage instanceof UserDbStorage) {
+            UserDbStorage userDbStorage = (UserDbStorage) userStorage;
+            if (!userDbStorage.friendshipExists(userId, friendId)) {
+                userDbStorage.addFriendOneWay(userId, friendId);
+                log.trace("Пользователь {} добавил пользователя {} в друзья", userId, friendId);
+            } else {
+                log.trace("Пользователь {} уже в друзьях у {}", friendId, userId);
+            }
         } else {
-            userStorage.update(user);
-        }
+            boolean addedToUser = user.addFriend(friendId);
 
-        if (!addedToFriend) {
-            log.trace("Пользователь {} уже в друзьях у {}", userId, friendId);
-        } else {
-            userStorage.update(friend);
+            if (addedToUser) {
+                userStorage.update(user);
+                log.trace("Пользователь {} добавил пользователя {} в друзья", userId, friendId);
+            } else {
+                log.trace("Пользователь {} уже в друзьях у {}", friendId, userId);
+            }
         }
     }
 
@@ -84,19 +90,22 @@ public class UserService {
         User user = findById(userId);
         User friend = findById(friendId);
 
-        boolean removedFromUser = user.removeFriend(friendId);
-        boolean removedFromFriend = friend.removeFriend(userId);
-
-        if (!removedFromUser) {
-            log.trace("Пользователь {} не был в друзьях у {}", friendId, userId);
+        if (userStorage instanceof UserDbStorage) {
+            UserDbStorage userDbStorage = (UserDbStorage) userStorage;
+            if (userDbStorage.friendshipExists(userId, friendId)) {
+                userDbStorage.removeFriendOneWay(userId, friendId);
+                log.trace("Пользователь {} удалил пользователя {} из друзей", userId, friendId);
+            } else {
+                log.trace("Пользователь {} не был в друзьях у {}", friendId, userId);
+            }
         } else {
-            userStorage.update(user);
-        }
-
-        if (!removedFromFriend) {
-            log.trace("Пользователь {} не был в друзьях у {}", userId, friendId);
-        } else {
-            userStorage.update(friend);
+            boolean removedFromUser = user.removeFriend(friendId);
+            if (removedFromUser) {
+                userStorage.update(user);
+                log.trace("Пользователь {} удалил пользователя {} из друзей", userId, friendId);
+            } else {
+                log.trace("Пользователь {} не был в друзьях у {}", friendId, userId);
+            }
         }
     }
 

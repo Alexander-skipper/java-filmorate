@@ -7,7 +7,9 @@ import ru.yandex.practicum.filmorate.validation.CreateValidation;
 import ru.yandex.practicum.filmorate.validation.UpdateValidation;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -30,10 +32,20 @@ public class Film {
             groups = {CreateValidation.class, UpdateValidation.class})
     @Min(value = 1, message = "Продолжительность должна быть не менее 1 минуты",
             groups = {CreateValidation.class, UpdateValidation.class})
-    private int duration;
+    private Integer duration;
 
     @JsonIgnore
     private Set<Long> likes = new HashSet<>();
+
+    @JsonIgnore
+    private Long mpaId;
+
+    private Mpa mpa;
+
+    @JsonIgnore
+    private Set<Long> genreIds = new HashSet<>();
+
+    private List<Genre> genres = new ArrayList<>();
 
     public boolean addLike(Long userId) {
         return likes.add(userId);
