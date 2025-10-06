@@ -40,5 +40,4 @@ public class FilmDbStorageTest {
                         assertThat(f).hasFieldOrPropertyWithValue("filmId", createdFilm.getId())
                 );
     }
-    
 }
