@@ -2,8 +2,8 @@ package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+import ru.yandex.practicum.filmorate.dal.FilmDbStorage;
 import ru.yandex.practicum.filmorate.dal.GenreDbStorage;
 import ru.yandex.practicum.filmorate.dal.MpaDbStorage;
 import ru.yandex.practicum.filmorate.exception.FilmNotFoundException;
@@ -25,8 +25,8 @@ public class FilmService {
     private final GenreDbStorage genreStorage;
 
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
-                       @Qualifier("userDbStorage") UserStorage userStorage,
+    public FilmService(FilmStorage filmStorage,
+                       UserStorage userStorage,
                        MpaDbStorage mpaStorage, GenreDbStorage genreStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
@@ -76,39 +76,47 @@ public class FilmService {
     }
 
     public void addLike(Long filmId, Long userId) {
-        Film film = findById(filmId);
+        findById(filmId);
         userStorage.findById(userId)
                 .orElseThrow(() ->
                         new UserNotFoundException("Пользователь с id = " + userId + " не найден"));
 
-        boolean added = film.addLike(userId);
-
-        if (!added) {
-            log.trace("Пользователь {} уже лайкал фильм {}", userId, filmId);
-            return;
+        if (filmStorage instanceof FilmDbStorage) {
+            FilmDbStorage filmDbStorage = (FilmDbStorage) filmStorage;
+            if (!filmDbStorage.hasLike(filmId, userId)) {
+                filmDbStorage.addLike(filmId, userId);
+                log.trace("Лайк добавлен: фильм {}, пользователь {}", filmId, userId);
+            } else {
+                log.trace("Пользователь {} уже лайкал фильм {}", userId, filmId);
+            }
         }
-        filmStorage.update(film);
-        log.trace("Лайк добавлен: фильм {}, пользователь {}", filmId, userId);
     }
 
     public void removeLike(Long filmId, Long userId) {
-        Film film = findById(filmId);
+        findById(filmId);
         userStorage.findById(userId)
                 .orElseThrow(() ->
                         new UserNotFoundException("Пользователь с id = " + userId + " не найден"));
 
-        boolean removed = film.removeLike(userId);
-        if (!removed) {
-            log.trace("Пользователь {} не лайкал фильм {}", userId, filmId);
-            return;
+        if (filmStorage instanceof FilmDbStorage) {
+            FilmDbStorage filmDbStorage = (FilmDbStorage) filmStorage;
+            if (filmDbStorage.hasLike(filmId, userId)) {
+                filmDbStorage.removeLike(filmId, userId);
+                log.trace("Лайк удален: фильм {}, пользователь {}", filmId, userId);
+            } else {
+                log.trace("Пользователь {} не лайкал фильм {}", userId, filmId);
+            }
         }
-        filmStorage.update(film);
-        log.trace("Лайк удален: фильм {}, пользователь {}", filmId, userId);
     }
 
     public List<Film> getPopularFilms(int count) {
         return filmStorage.findAll().stream()
-                .sorted(Comparator.comparingInt(Film::getLikesCount).reversed())
+                .sorted((f1, f2) -> Integer.compare(
+                        filmStorage instanceof FilmDbStorage ?
+                                ((FilmDbStorage) filmStorage).getLikesCount(f2.getId()) : 0,
+                        filmStorage instanceof FilmDbStorage ?
+                                ((FilmDbStorage) filmStorage).getLikesCount(f1.getId()) : 0
+                ))
                 .limit(count)
                 .collect(Collectors.toList());
     }

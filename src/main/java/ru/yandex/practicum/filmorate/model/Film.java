@@ -34,8 +34,6 @@ public class Film {
             groups = {CreateValidation.class, UpdateValidation.class})
     private Integer duration;
 
-    @JsonIgnore
-    private Set<Long> likes = new HashSet<>();
 
     @JsonIgnore
     private Long mpaId;
@@ -47,15 +45,4 @@ public class Film {
 
     private List<Genre> genres = new ArrayList<>();
 
-    public boolean addLike(Long userId) {
-        return likes.add(userId);
-    }
-
-    public boolean removeLike(Long userId) {
-        return likes.remove(userId);
-    }
-
-    public int getLikesCount() {
-        return likes.size();
-    }
 }

@@ -1,7 +1,5 @@
 package ru.yandex.practicum.filmorate.dal;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -13,8 +11,6 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Qualifier("userDbStorage")
-@Slf4j
 public class UserDbStorage extends BaseRepository<User> implements UserStorage {
 
     public UserDbStorage(JdbcTemplate jdbc, RowMapper<User> mapper) {

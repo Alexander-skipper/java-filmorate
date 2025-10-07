@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.dal;
 
-import org.springframework.beans.factory.annotation.Qualifier;
+
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -13,7 +13,6 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 import java.util.*;
 
 @Repository
-@Qualifier("filmDbStorage")
 public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
 
     public FilmDbStorage(JdbcTemplate jdbc, RowMapper<Film> mapper) {
@@ -52,7 +51,6 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
 
             // Обновляем связи используя genreIds
             updateGenres(film);
-            updateLikes(film);
 
             return findById(id).orElse(film);
         } catch (Exception e) {
@@ -85,7 +83,6 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
             update(sql, film.getName(), film.getDescription(), film.getReleaseDate(), film.getDuration(), film.getMpaId(), film.getId());
 
             updateGenres(film);
-            updateLikes(film);
 
             return findById(film.getId()).orElse(film);
         } catch (Exception e) {
@@ -129,12 +126,17 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
         return count != null && count > 0;
     }
 
+    public int getLikesCount(Long filmId) {
+        String sql = "SELECT COUNT(*) FROM film_likes WHERE film_id = ?";
+        Integer count = jdbc.queryForObject(sql, Integer.class, filmId);
+        return count != null ? count : 0;
+    }
+
     private void loadAdditionalData(Film film) {
         if (film == null || film.getId() == null) return;
         Long originalId = film.getId();
         loadGenreIds(film);      // Загружаем ID в genreIds
         loadGenreObjects(film);  // Загружаем объекты в genres
-        loadLikes(film);
         loadMpa(film);
         if (!originalId.equals(film.getId())) {
             film.setId(originalId);
@@ -167,13 +169,6 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
         film.setGenres(genres);
     }
 
-    private void loadLikes(Film film) {
-        String sql = "SELECT user_id FROM film_likes WHERE film_id = ?";
-        List<Long> likeIds = jdbc.queryForList(sql, Long.class, film.getId());
-        film.getLikes().clear();
-        film.getLikes().addAll(likeIds);
-    }
-
     private void loadMpa(Film film) {
         if (film == null || film.getId() == null) return;
         String sql = "SELECT m.mpa_id, m.name, m.description FROM mpa_ratings m JOIN films f ON m.mpa_id = f.mpa_id WHERE f.film_id = ?";
@@ -201,15 +196,6 @@ public class FilmDbStorage extends BaseRepository<Film> implements FilmStorage {
         if (film.getGenreIds() != null && !film.getGenreIds().isEmpty()) {
             for (Long genreId : film.getGenreIds()) {
                 jdbc.update("INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)", film.getId(), genreId);
-            }
-        }
-    }
-
-    private void updateLikes(Film film) {
-        jdbc.update("DELETE FROM film_likes WHERE film_id = ?", film.getId());
-        if (film.getLikes() != null && !film.getLikes().isEmpty()) {
-            for (Long userId : film.getLikes()) {
-                jdbc.update("INSERT INTO film_likes (film_id, user_id) VALUES (?, ?)", film.getId(), userId);
             }
         }
     }
